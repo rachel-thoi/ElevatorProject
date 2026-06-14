@@ -1,0 +1,181 @@
+-------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer: 
+
+-- 
+
+-- Create Date:   17:49:35 04/16/2025 
+
+-- Design Name:    
+
+-- Module Name:   U:/ECE3561/ECE3561proj3/DelayMemoryTest.vhd 
+
+-- Project Name:  ECE3561proj 
+
+-- Target Device:   
+
+-- Tool versions:   
+
+-- Description:    
+
+--  
+
+-- VHDL Test Bench Created by ISE for module: DelayMemory 
+
+--  
+
+-- Dependencies: 
+
+--  
+
+-- Revision: 
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments: 
+
+-- 
+
+-- Notes:  
+
+-- This testbench has been automatically generated using types std_logic and 
+
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends 
+
+-- that these types always be used for the top-level I/O of a design in order 
+
+-- to guarantee that the testbench will bind correctly to the post-implementation  
+
+-- simulation model. 
+
+-------------------------------------------------------------------------------- 
+
+LIBRARY ieee; 
+
+USE ieee.std_logic_1164.ALL; 
+
+  
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+USE ieee.numeric_std.ALL; 
+
+  
+
+ENTITY DelayMemoryTest IS 
+
+END DelayMemoryTest; 
+
+  
+
+ARCHITECTURE behavior OF DelayMemoryTest IS  
+
+  
+
+    -- Component Declaration for the Unit Under Test (UUT) 
+
+  
+
+    COMPONENT DelayMemory 
+
+ generic (D0: std_logic_vector(4 downto 1);  
+
+D1: std_logic_vector(4 downto 1));  
+
+    PORT( 
+
+         Sel : IN  std_logic; 
+
+         Val : OUT  std_logic_vector(4 downto 1) 
+
+        ); 
+
+    END COMPONENT; 
+
+     
+
+ 
+
+   --Inputs 
+
+   signal Sel : std_logic := '0'; 
+
+ 
+
+ 	--Outputs 
+
+   signal Val : std_logic_vector(4 downto 1); 
+
+   -- No clocks detected in port list. Replace <clock> below with  
+
+   -- appropriate port name  
+
+ 
+
+ --Declaring vector for temporal 
+
+signal Temporal: std_logic_vector(5 downto 0):="000000";  
+
+  
+
+  
+
+BEGIN 
+
+  
+
+-- Instantiate the Unit Under Test (UUT) 
+
+   uut: DelayMemory GENERIC MAP (D0 => "0101", D1 => "1010")  
+
+PORT MAP ( 
+
+          Sel => Sel, 
+
+          Val => Val 
+
+        );  
+
+   
+
+   -- *** Test Bench -- User Defined Section *** 
+
+tb:	Process 
+
+BEGIN 
+
+for i in 0 to 50 loop -- VHDL loop statement  
+
+-- SYSCLK <= TEMPORAL(0); -- assigning the LSB of TEMPORAL to CLK 
+
+TEMPORAL <= std_logic_vector(UNSIGNED(TEMPORAL) + 1);  
+
+-- increment TEMPORAL 
+
+if (TEMPORAL = "000010") then -- VHDL if statement 
+
+SEL <= '0';  
+
+end if;  
+
+if (TEMPORAL = "000100") then -- VHDL if statement 
+
+SEL <= '1';   
+
+end if;  
+
+wait for 50 ns; -- CLK high/low for 50ns 
+
+end loop;  
+
+      wait; 
+
+   end process; 
+
+ 
+
+END; 
