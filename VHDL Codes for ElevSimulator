@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    20:17:56 04/20/2025  
+
+-- Design Name:  
+
+-- Module Name:    ElevSimulator - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+use work.elev_components.all; 
+
+use work.elev_sim_components.all; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+--use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if instantiating 
+
+-- any Xilinx primitives in this code. 
+
+--library UNISIM; 
+
+--use UNISIM.VComponents.all; 
+
+ 
+
+entity ElevSimulator is 
+
+    Port ( SYSCLK : in  STD_LOGIC; 
+
+           POC : in  STD_LOGIC; 
+
+           EMVUP : in  STD_LOGIC; 
+
+           EMVDN : in  STD_LOGIC; 
+
+           EOPEN : in  STD_LOGIC; 
+
+           ECLOSE : in  STD_LOGIC; 
+
+           ECOMP : out  STD_LOGIC; 
+
+           EF : out  STD_LOGIC_VECTOR (4 downto 1)); 
+
+end ElevSimulator; 
+
+ 
+
+architecture Behavioral of ElevSimulator is 
+
+signal DelaySel:	std_logic; 
+
+signal DelayVal:	std_logic_vector(4 downto 1); 
+
+signal LoadPC:		std_logic; 
+
+signal EnPC:		std_logic; 
+
+signal RcoPC:		std_logic; 
+
+signal LoadCF:		std_logic; 
+
+signal LshCF:		std_logic; 
+
+signal RshCF:		std_logic; 
+
+signal EFInt:		std_logic_vector(4 downto 1); 
+
+begin 
+
+DM: DelayMemory 
+
+generic map (D0 => "0011", D1 => "0101")	-- TODO: update these values 
+
+port map (DelaySel, DelayVal); 
+
+PC: DownCounter 
+
+port map (SYSCLK, LoadPC, DelayVal, EnPC, open, RcoPC); 
+
+CF: ShiftRegister 
+
+port map (SYSCLK, "0001", LoadCF, LshCF, RshCF, EFInt); 
+
+SC: SimController 
+
+port map (SYSCLK, POC, EMVUP, EMVDN, EOPEN, ECLOSE, ECOMP, RcoPC, EFInt, 
+
+DelaySel, LoadPC, EnPC, LoadCF, LshCF, RshCF); 
+
+EF <= EfInt; 
+
+ 
+
+end Behavioral; 
