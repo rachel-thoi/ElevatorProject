@@ -1,0 +1,135 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    19:21:00 04/20/2025  
+
+-- Design Name:  
+
+-- Module Name:    ReqProcessor - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+--use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if instantiating 
+
+-- any Xilinx primitives in this code. 
+
+--library UNISIM; 
+
+--use UNISIM.VComponents.all; 
+
+ 
+
+entity ReqProcessor is 
+
+port ( UpReq:		in		std_logic_vector(3 downto 1); 
+
+ DnReq:		in		std_logic_vector(4 downto 2); 
+
+ GoReq:		in		std_logic_vector(4 downto 1); 
+
+ Here:		in		std_logic_vector(4 downto 1); 
+
+ Up:			in		std_logic; 
+
+ Dn:			in		std_logic; 
+
+ ReqUp:		out	std_logic; 
+
+ ReqDn:		out	std_logic; 
+
+ ReqHere:	out	std_logic	); 
+
+end ReqProcessor; 
+
+ 
+
+architecture Behavioral of ReqProcessor is 
+
+signal UpReqMasked: 	std_logic_vector(4 downto 1); 
+
+signal DnReqMasked: 	std_logic_vector(4 downto 1); 
+
+signal AboveTemp:		std_logic_vector(4 downto 1); 
+
+signal BelowTemp:		std_logic_vector(4 downto 1); 
+
+begin 
+
+-- Is there a request on the current floor that aligns with the current movement direction? 
+
+UpReqMasked <= ('0' & UpReq) when Dn = '0' else "0000"; 
+
+DnReqMasked <= (DnReq & '0') when Up = '0' else "0000"; 
+
+ReqHere <= '0' when (Here and (UpReqMasked or DnReqMasked or GoReq)) = "0000" else '1'; 
+
+ 
+
+-- Is there a request above the current floor? 
+
+AboveTemp(1) <= '0'; 
+
+gen_above: for i in 2 to 4 generate 
+
+AboveTemp(i) <= AboveTemp(i-1) or Here(i-1); 
+
+end generate; 
+
+ReqUp <= '0' when (AboveTemp and (('0' & UpReq) or (DnReq & '0') or GoReq)) = "0000" else '1'; 
+
+ 
+
+-- Is there a request below the current floor? 
+
+BelowTemp(4) <= '0'; 
+
+gen_below: for i in 1 to 3 generate 
+
+BelowTemp(i) <= BelowTemp(i+1) or Here(i+1); 
+
+end generate; 
+
+ReqDn <= '0' when (BelowTemp and (('0' & UpReq) or (DnReq & '0') or GoReq)) = "0000" else '1'; 
+
+end Behavioral; 
