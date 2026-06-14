@@ -1,0 +1,263 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    16:38:12 04/21/2025  
+
+-- Design Name:  
+
+-- Module Name:    ControllerController - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+--use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if instantiating 
+
+-- any Xilinx primitives in this code. 
+
+--library UNISIM; 
+
+--use UNISIM.VComponents.all; 
+
+ 
+
+entity ControllerController is 
+
+port ( SYSCLK:		in		std_logic; 
+
+ POC:			in		std_logic; 
+
+ ECOMP:		in		std_logic; 
+
+ DROPEN:		in		std_logic; 
+
+ DRCLOSE:	in		std_logic; 
+
+ EMVUP:		out	std_logic; 
+
+ EMVDN:		out	std_logic; 
+
+ EOPEN:		out	std_logic; 
+
+ ECLOSE:		out	std_logic; 
+
+  
+
+ DirUp:		in		std_logic; 
+
+ DirDn:		in		std_logic; 
+
+ ReqHere:	in		std_logic; 
+
+ ReqUp:		in		std_logic; 
+
+ ReqDn:		in		std_logic; 
+
+ RcoPC:		in		std_logic; 
+
+  
+
+ UpDir:		out	std_logic; 
+
+ DnDir:		out	std_logic; 
+
+ ClrDir:		out	std_logic; 
+
+ DelaySel:	out	std_logic; 
+
+ LoadPC:		out	std_logic; 
+
+ EnPC:		out	std_logic; 
+
+ ClrHere:	out	std_logic; 
+
+ ClrAll:		out	std_logic	); 
+
+end ControllerController; 
+
+ 
+
+architecture Behavioral of ControllerController is 
+
+type states is (Inactive, Opening, Opened, Closing, Moving); 
+
+signal state: states := Inactive; 
+
+begin 
+
+process (SYSCLK) 
+
+begin 
+
+if (rising_edge(SYSCLK)) then 
+
+case State is 
+
+when Inactive => 
+
+if ReqHere = '1' then 
+
+state <= Opening; 
+
+elsif (ReqUp and not ReqHere and not DirDn) = '1' then 
+
+state <= Moving; 
+
+elsif (ReqDn and not ReqHere and not DirUp) = '1' then 
+
+state <= Moving; 
+
+else 
+
+state <= Inactive; 
+
+end if; 
+
+when Opening => 
+
+if ECOMP = '1' then 
+
+state <= Opened; 
+
+else 
+
+state <= Opening; 
+
+end if; 
+
+when Opened => 
+
+if (not RcoPC and not DrClose) = '1' then 
+
+state <= Opened; 
+
+else 
+
+state <= Closing; 
+
+end if; 
+
+when Closing => 
+
+if ReqHere = '1' then 
+
+state <= Opening; 
+
+elsif (not ECOMP and not ReqHere) = '1' then 
+
+state <= Closing; 
+
+elsif (ECOMP and not ReqHere) = '1' then 
+
+state <= Inactive; 
+
+end if; 
+
+when Moving => 
+
+if not ECOMP = '1' then 
+
+state <= Moving; 
+
+else 
+
+state <= Inactive; 
+
+end if; 
+
+end case; 
+
+if POC = '1' then 
+
+state <= Inactive; 
+
+end if; 
+
+end if; 
+
+end process; 
+
+ 
+
+EMVUP <= (ReqUp and not ReqHere and not DirDn) when state = Inactive else '0'; 
+
+EMVDN <= (ReqDn and not ReqHere and not DirUp) when state = Inactive else '0'; 
+
+with state select 
+
+EOPEN <= ReqHere when Inactive, 
+
+ReqHere when Closing, 
+
+'0' when others; 
+
+ECLOSE <= RcoPC or DrClose when state = Opened else '0'; 
+
+ 
+
+UpDir <= (ReqUp and not ReqHere and not DirDn) when state = Inactive else '0'; 
+
+DnDir <= (ReqDn and not ReqHere and not DirUp) when state = Inactive else '0'; 
+
+ClrDir <= (not ReqHere and not (ReqUp and not ReqHere and not DirDn) 
+
+and not (ReqDn and not ReqHere and not DirUp)) or POC when state = Inactive else POC; 
+
+DelaySel <= '0'; 
+
+LoadPC <= ECOMP when state = Opening else '0'; 
+
+with state select 
+
+EnPC <= (not RcoPC and not DrClose) when Opened, 
+
+  ECOMP when Opening, 
+
+  '0' when others; 
+
+ClrHere <= (RcoPC or DrClose) when state = Opened else '0'; 
+
+ClrAll <= POC; 
+
+ 
+
+end Behavioral; 
