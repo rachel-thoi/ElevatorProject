@@ -1,0 +1,205 @@
+-------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer: 
+
+-- 
+
+-- Create Date:   15:55:08 04/16/2025 
+
+-- Design Name:    
+
+-- Module Name:   U:/ECE3561/ECE3561proj3/ShiftRegisterTest1.vhd 
+
+-- Project Name:  ECE3561proj 
+
+-- Target Device:   
+
+-- Tool versions:   
+
+-- Description:    
+
+--  
+
+-- VHDL Test Bench Created by ISE for module: ShiftRegister 
+
+--  
+
+-- Dependencies: 
+
+--  
+
+-- Revision: 
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments: 
+
+-- 
+
+-- Notes:  
+
+-- This testbench has been automatically generated using types std_logic and 
+
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends 
+
+-- that these types always be used for the top-level I/O of a design in order 
+
+-- to guarantee that the testbench will bind correctly to the post-implementation  
+
+-- simulation model. 
+
+-------------------------------------------------------------------------------- 
+
+LIBRARY ieee; 
+
+USE ieee.std_logic_1164.ALL; 
+
+  
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+USE ieee.numeric_std.ALL; 
+
+  
+
+ENTITY ShiftRegisterTest1 IS 
+
+END ShiftRegisterTest1; 
+
+  
+
+ARCHITECTURE behavior OF ShiftRegisterTest1 IS  
+
+  
+
+    -- Component Declaration for the Unit Under Test (UUT) 
+
+  
+
+    COMPONENT ShiftRegister 
+
+    PORT( 
+
+         SYSCLK : IN  std_logic; 
+
+         ValueIn : IN  std_logic_vector(4 downto 1); 
+
+         Load : IN  std_logic; 
+
+         Lsh : IN  std_logic; 
+
+         Rsh : IN  std_logic; 
+
+         ValueOut : OUT  std_logic_vector(4 downto 1) 
+
+        ); 
+
+    END COMPONENT; 
+
+     
+
+ 
+
+   --Inputs 
+
+   signal SYSCLK : std_logic := '0'; 
+
+   signal ValueIn : std_logic_vector(4 downto 1) := (others => '0'); 
+
+   signal Load : std_logic := '0'; 
+
+   signal Lsh : std_logic := '0'; 
+
+   signal Rsh : std_logic := '0'; 
+
+ 
+
+ 	--Outputs 
+
+   signal ValueOut : std_logic_vector(4 downto 1); 
+
+ 
+
+   --Declaring vector for temporal 
+
+signal Temporal: std_logic_vector(5 downto 0):="000000";  
+
+  
+
+BEGIN 
+
+  
+
+-- Instantiate the Unit Under Test (UUT) 
+
+   uut: ShiftRegister PORT MAP ( 
+
+          SYSCLK => SYSCLK, 
+
+          ValueIn => ValueIn, 
+
+          Load => Load, 
+
+          Lsh => Lsh, 
+
+          Rsh => Rsh, 
+
+          ValueOut => ValueOut 
+
+        ); 
+
+   
+
+-- *** Test Bench -- User Defined Section *** 
+
+tb:	Process 
+
+BEGIN 
+
+for i in 0 to 50 loop -- VHDL loop statement  
+
+SYSCLK <= TEMPORAL(0); -- assigning the LSB of TEMPORAL to CLK 
+
+TEMPORAL <= std_logic_vector(UNSIGNED(TEMPORAL) + 1);  
+
+-- increment TEMPORAL 
+
+if (TEMPORAL = "000010") then -- VHDL if statement 
+
+LOAD <= '1';  
+
+VALUEIN <= "0001";  
+
+end if;  
+
+if (TEMPORAL = "000100") then -- VHDL if statement 
+
+LOAD <= '0';  
+
+LSH <= '1';  
+
+end if;  
+
+if (TEMPORAL = "001010") then -- VHDL if statement 
+
+RSH <= '1';  
+
+LSH <= '0';  
+
+end if;  
+
+wait for 50 ns; -- CLK high/low for 50ns 
+
+end loop;  
+
+      wait; 
+
+   end process; 
+
+ 
+
+END; 
