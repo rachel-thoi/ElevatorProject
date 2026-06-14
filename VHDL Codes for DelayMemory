@@ -1,0 +1,107 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    17:21:28 04/16/2025  
+
+-- Design Name:  
+
+-- Module Name:    DelayMemory - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+--use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if instantiating 
+
+-- any Xilinx primitives in this code. 
+
+--library UNISIM; 
+
+--use UNISIM.VComponents.all; 
+
+ 
+
+entity DelayMemory is 
+
+generic (D0: std_logic_vector(4 downto 1);  
+
+D1: std_logic_vector(4 downto 1)); 				 
+
+port ( Sel: in std_logic;  
+
+ Val: out std_logic_vector(4 downto 1));   
+
+end DelayMemory; 
+
+ 
+
+architecture Behavioral of DelayMemory is 
+
+signal Value:	std_logic_vector(4 downto 1); 
+
+begin 
+
+ 
+
+process (Sel) 
+
+begin 
+
+if (Sel = '0') then  
+
+Value <= D0;   
+
+elsif (Sel = '1') then  
+
+Value <= D1;  
+
+end if;  
+
+end process; 
+
+ 
+
+Val <= Value; 
+
+ 
+
+end Behavioral; 
