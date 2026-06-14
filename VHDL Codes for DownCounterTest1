@@ -1,0 +1,197 @@
+-------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer: 
+
+-- 
+
+-- Create Date:   15:56:53 04/20/2025 
+
+-- Design Name:    
+
+-- Module Name:   U:/Documents/ECE3561/ECE3561Proj3/DownCounterTest1.vhd 
+
+-- Project Name:  ECE3561Proj3 
+
+-- Target Device:   
+
+-- Tool versions:   
+
+-- Description:    
+
+--  
+
+-- VHDL Test Bench Created by ISE for module: DownCounter 
+
+--  
+
+-- Dependencies: 
+
+--  
+
+-- Revision: 
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments: 
+
+-- 
+
+-- Notes:  
+
+-- This testbench has been automatically generated using types std_logic and 
+
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends 
+
+-- that these types always be used for the top-level I/O of a design in order 
+
+-- to guarantee that the testbench will bind correctly to the post-implementation  
+
+-- simulation model. 
+
+-------------------------------------------------------------------------------- 
+
+LIBRARY ieee; 
+
+USE ieee.std_logic_1164.ALL; 
+
+  
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+USE ieee.numeric_std.ALL; 
+
+  
+
+ENTITY DownCounterTest1 IS 
+
+END DownCounterTest1; 
+
+  
+
+ARCHITECTURE behavior OF DownCounterTest1 IS  
+
+  
+
+    -- Component Declaration for the Unit Under Test (UUT) 
+
+  
+
+    COMPONENT DownCounter 
+
+    PORT( 
+
+         SYSCLK : IN  std_logic; 
+
+         Load : IN  std_logic; 
+
+         ValueIn : IN  std_logic_vector(4 downto 1); 
+
+         EN : IN  std_logic; 
+
+         ValueOut : OUT  std_logic_vector(4 downto 1); 
+
+         RCO : OUT  std_logic 
+
+        ); 
+
+    END COMPONENT; 
+
+     
+
+ 
+
+   --Inputs 
+
+   signal SYSCLK : std_logic := '0'; 
+
+   signal Load : std_logic := '0'; 
+
+   signal ValueIn : std_logic_vector(4 downto 1) := (others => '0'); 
+
+   signal EN : std_logic := '0'; 
+
+ 
+
+ 	--Outputs 
+
+   signal ValueOut : std_logic_vector(4 downto 1); 
+
+   signal RCO : std_logic; 
+
+ 
+
+   --Declaring vector for temporal 
+
+signal Temporal: std_logic_vector(5 downto 0):="000000"; 
+
+  
+
+BEGIN 
+
+  
+
+-- Instantiate the Unit Under Test (UUT) 
+
+   uut: DownCounter PORT MAP ( 
+
+          SYSCLK => SYSCLK, 
+
+          Load => Load, 
+
+          ValueIn => ValueIn, 
+
+          EN => EN, 
+
+          ValueOut => ValueOut, 
+
+          RCO => RCO 
+
+        ); 
+
+ 
+
+-- *** Test Bench -- User Defined Section *** 
+
+tb:	Process 
+
+BEGIN 
+
+for i in 0 to 50 loop -- VHDL loop statement  
+
+SYSCLK <= TEMPORAL(0); -- assigning the LSB of TEMPORAL to CLK 
+
+TEMPORAL <= std_logic_vector(UNSIGNED(TEMPORAL) + 1);  
+
+-- increment TEMPORAL 
+
+if (TEMPORAL = "000010") then -- VHDL if statement 
+
+LOAD <= '1';  
+
+VALUEIN <= "1000";  
+
+end if;  
+
+if (TEMPORAL = "000100") then -- VHDL if statement 
+
+LOAD <= '0';  
+
+EN<= '1';  
+
+end if; 
+
+wait for 50 ns; -- CLK high/low for 50ns 
+
+end loop;  
+
+      wait; 
+
+   end process; 
+
+ 
+
+END; 
