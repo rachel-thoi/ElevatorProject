@@ -1,0 +1,111 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    17:59:38 04/09/2025  
+
+-- Design Name:  
+
+-- Module Name:    ShiftRegister - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+--use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+entity ShiftRegister is 
+
+generic (N: integer := 4); 
+
+port ( SYSCLK:		in		std_logic; 
+
+ ValueIn:	in		std_logic_vector(N downto 1); 
+
+ Load:		in		std_logic; 
+
+ Lsh:			in		std_logic; 
+
+ Rsh:			in		std_logic; 
+
+ ValueOut:	out	std_logic_vector(N downto 1)	); 
+
+end ShiftRegister; 
+
+ 
+
+architecture Behavioral of ShiftRegister is 
+
+signal Value:	std_logic_vector(N downto 1); 
+
+begin 
+
+ 
+
+process (SYSCLK) 
+
+begin 
+
+if (rising_edge(SYSCLK)) then 
+
+if (Load = '1') then 
+
+Value <= ValueIn; 
+
+elsif (Lsh = '1') then 
+
+Value <= Value(N-1 downto 1) & '0'; 
+
+elsif (Rsh = '1') then 
+
+Value <= '0' & Value(N downto 2); 
+
+end if; 
+
+end if; 
+
+end process; 
+
+ 
+
+ValueOut <= Value; 
+
+ 
+
+end Behavioral; 
