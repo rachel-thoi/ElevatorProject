@@ -1,0 +1,119 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    18:11:42 04/16/2025  
+
+-- Design Name:  
+
+-- Module Name:    DownCounter - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+ use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if instantiating 
+
+-- any Xilinx primitives in this code. 
+
+--library UNISIM; 
+
+-- use UNISIM.VComponents.all; 
+
+ 
+
+entity DownCounter is 
+
+generic (N: integer := 4); 
+
+port ( SYSCLK:		in		std_logic; 
+
+ Load:		in		std_logic; 
+
+ ValueIn:	in		std_logic_vector(N downto 1); 
+
+ EN:			in		std_logic; 
+
+ ValueOut:	out	std_logic_vector(N downto 1); 
+
+ RCO:			out	std_logic); 
+
+end DownCounter; 
+
+ 
+
+architecture Behavioral of DownCounter is 
+
+signal Value:	std_logic_vector(N downto 1); 
+
+begin 
+
+ 
+
+process (SYSCLK) 
+
+begin 
+
+if (rising_edge(SYSCLK)) then 
+
+if (Load = '1') then 
+
+Value <= ValueIn; 
+
+elsif (EN = '1') then 
+
+Value <= std_logic_vector(UNSIGNED(Value) - 1);  
+
+end if; 
+
+end if; 
+
+end process; 
+
+ 
+
+ValueOut <= Value; 
+
+RCO <= '1' when Value = (Value'range => '0') else '0';  
+
+ 
+
+end Behavioral; 
