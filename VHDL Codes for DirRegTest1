@@ -1,0 +1,203 @@
+-------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer: 
+
+-- 
+
+-- Create Date:   18:14:50 04/20/2025 
+
+-- Design Name:    
+
+-- Module Name:   U:/Documents/ECE3561/ECE3561Proj3/DirRegTest1.vhd 
+
+-- Project Name:  ECE3561Proj3 
+
+-- Target Device:   
+
+-- Tool versions:   
+
+-- Description:    
+
+--  
+
+-- VHDL Test Bench Created by ISE for module: DirReg 
+
+--  
+
+-- Dependencies: 
+
+--  
+
+-- Revision: 
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments: 
+
+-- 
+
+-- Notes:  
+
+-- This testbench has been automatically generated using types std_logic and 
+
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends 
+
+-- that these types always be used for the top-level I/O of a design in order 
+
+-- to guarantee that the testbench will bind correctly to the post-implementation  
+
+-- simulation model. 
+
+-------------------------------------------------------------------------------- 
+
+LIBRARY ieee; 
+
+USE ieee.std_logic_1164.ALL; 
+
+  
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+USE ieee.numeric_std.ALL; 
+
+  
+
+ENTITY DirRegTest1 IS 
+
+END DirRegTest1; 
+
+  
+
+ARCHITECTURE behavior OF DirRegTest1 IS  
+
+  
+
+    -- Component Declaration for the Unit Under Test (UUT) 
+
+  
+
+    COMPONENT DirReg 
+
+    PORT( 
+
+         SYSCLK : IN  std_logic; 
+
+         SetUp : IN  std_logic; 
+
+         SetDn : IN  std_logic; 
+
+         Clr : IN  std_logic; 
+
+         Up : OUT  std_logic; 
+
+         Dn : OUT  std_logic 
+
+        ); 
+
+    END COMPONENT; 
+
+     
+
+ 
+
+   --Inputs 
+
+   signal SYSCLK : std_logic := '0'; 
+
+   signal SetUp : std_logic := '0'; 
+
+   signal SetDn : std_logic := '0'; 
+
+   signal Clr : std_logic := '0'; 
+
+ 
+
+ 	--Outputs 
+
+   signal Up : std_logic; 
+
+   signal Dn : std_logic; 
+
+ 
+
+   --Declaring vector for temporal 
+
+signal Temporal: std_logic_vector(5 downto 0):="000000";  
+
+  
+
+BEGIN 
+
+  
+
+-- Instantiate the Unit Under Test (UUT) 
+
+   uut: DirReg PORT MAP ( 
+
+          SYSCLK => SYSCLK, 
+
+          SetUp => SetUp, 
+
+          SetDn => SetDn, 
+
+          Clr => Clr, 
+
+          Up => Up, 
+
+          Dn => Dn 
+
+        ); 
+
+ 
+
+-- *** Test Bench -- User Defined Section *** 
+
+tb:	Process 
+
+BEGIN 
+
+for i in 0 to 50 loop -- VHDL loop statement  
+
+SYSCLK <= TEMPORAL(0); -- assigning the LSB of TEMPORAL to CLK 
+
+TEMPORAL <= std_logic_vector(UNSIGNED(TEMPORAL) + 1);  
+
+-- increment TEMPORAL 
+
+if (TEMPORAL = "000010") then -- VHDL if statement 
+
+CLR <= '1'; 
+
+end if;  
+
+if (TEMPORAL = "000100") then -- VHDL if statement 
+
+CLR <= '0'; 
+
+SETUP <= '1'; 
+
+end if;  
+
+if (TEMPORAL = "000110") then -- VHDL if statement 
+
+SETUP <= '0'; 
+
+SETDN <= '1'; 
+
+end if;  
+
+wait for 50 ns; -- CLK high/low for 50ns 
+
+end loop;  
+
+      wait; 
+
+   end process; 
+
+ 
+
+END; 
