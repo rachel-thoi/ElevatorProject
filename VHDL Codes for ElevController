@@ -1,0 +1,177 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    20:58:25 04/20/2025  
+
+-- Design Name:  
+
+-- Module Name:    ElevController - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+use work.elev_components.all; 
+
+use work.elev_controller_components.all; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+--use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if instantiating 
+
+-- any Xilinx primitives in this code. 
+
+--library UNISIM; 
+
+--use UNISIM.VComponents.all; 
+
+ 
+
+entity ElevController is 
+
+    Port ( SYSCLK : in  STD_LOGIC; 
+
+           POC : in  STD_LOGIC; 
+
+           UP_REQ : in  STD_LOGIC_VECTOR (3 downto 1); 
+
+           DN_REQ : in  STD_LOGIC_VECTOR (4 downto 2); 
+
+           GO_REQ : in  STD_LOGIC_VECTOR (4 downto 1); 
+
+  DROPEN : in STD_LOGIC; 
+
+  DRCLOSE : in STD_LOGIC; 
+
+           ECOMP : in  STD_LOGIC; 
+
+           EF : in  STD_LOGIC_VECTOR (4 downto 1); 
+
+           EMVUP : out  STD_LOGIC; 
+
+           EMVDN : out  STD_LOGIC; 
+
+           EOPEN : out  STD_LOGIC; 
+
+           ECLOSE : out  STD_LOGIC; 
+
+           FLOOR_IND : out  STD_LOGIC_VECTOR (4 downto 1)); 
+
+end ElevController; 
+
+ 
+
+architecture Behavioral of ElevController is 
+
+signal UpDir, DnDir, ClrDir, DirUp, DirDn: std_logic; 
+
+signal DelaySel: std_logic; 
+
+signal DelayVal: std_logic_vector(4 downto 1); 
+
+signal LoadPC, EnPC, RcoPC: std_logic; 
+
+signal ClrHere, ClrAll: std_logic; 
+
+signal UpInt: std_logic_vector(3 downto 1); 
+
+signal DnInt: std_logic_vector(4 downto 2); 
+
+signal GoInt: std_logic_vector(4 downto 1); 
+
+signal ReqUp, ReqDn, ReqHereRP: std_logic; 
+
+signal ReqHere: std_logic; 
+
+begin 
+
+DIR: DirReg 
+
+port map (SYSCLK, UpDir, DnDir, ClrDir, DirUp, DirDn); 
+
+DM: DelayMemory 
+
+generic map (D0 => "1111", D1 => "0000")	-- Second value is unused 
+
+port map (DelaySel, DelayVal); 
+
+PC: DownCounter 
+
+port map (SYSCLK, LoadPC, DelayVal, EnPC, open, RcoPC); 
+
+UL: ReqLatch 
+
+generic map (Max => 3, Min => 1) 
+
+port map (SYSCLK, UP_REQ, EF, ClrHere, ClrAll, UpInt); 
+
+DL: ReqLatch 
+
+generic map (Max => 4, Min => 2) 
+
+port map (SYSCLK, DN_REQ, EF, ClrHere, ClrAll, DnInt); 
+
+GL: ReqLatch 
+
+generic map (Max => 4, Min => 1) 
+
+port map (SYSCLK, GO_REQ, EF, ClrHere, ClrAll, GoInt); 
+
+RP: ReqProcessor 
+
+port map (UpInt, DnInt, GoInt, EF, DirUp, DirDn, ReqUp, ReqDn, ReqHereRP); 
+
+CC: ControllerController 
+
+port map (SYSCLK, POC, ECOMP, DROPEN, DRCLOSE, EMVUP, EMVDN, EOPEN, ECLOSE, 
+
+DirUp, DirDn, ReqHere, ReqUp, ReqDn, RcoPC, 
+
+UpDir, DnDir, ClrDir, DelaySel, LoadPC, EnPC, ClrHere, ClrAll); 
+
+ 
+
+ReqHere <= ReqHereRP or DROPEN; 
+
+FLOOR_IND <= EF; 
+
+ 
+
+end Behavioral; 
