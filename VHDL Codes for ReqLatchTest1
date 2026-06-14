@@ -1,0 +1,225 @@
+-------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer: 
+
+-- 
+
+-- Create Date:   18:48:40 04/20/2025 
+
+-- Design Name:    
+
+-- Module Name:   U:/Documents/ECE3561/ECE3561Proj3/ReqLatchTest1.vhd 
+
+-- Project Name:  ECE3561Proj3 
+
+-- Target Device:   
+
+-- Tool versions:   
+
+-- Description:    
+
+--  
+
+-- VHDL Test Bench Created by ISE for module: ReqLatch 
+
+--  
+
+-- Dependencies: 
+
+--  
+
+-- Revision: 
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments: 
+
+-- 
+
+-- Notes:  
+
+-- This testbench has been automatically generated using types std_logic and 
+
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends 
+
+-- that these types always be used for the top-level I/O of a design in order 
+
+-- to guarantee that the testbench will bind correctly to the post-implementation  
+
+-- simulation model. 
+
+-------------------------------------------------------------------------------- 
+
+LIBRARY ieee; 
+
+USE ieee.std_logic_1164.ALL; 
+
+  
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+USE ieee.numeric_std.ALL; 
+
+  
+
+ENTITY ReqLatchTest1 IS 
+
+END ReqLatchTest1; 
+
+  
+
+ARCHITECTURE behavior OF ReqLatchTest1 IS  
+
+  
+
+    -- Component Declaration for the Unit Under Test (UUT) 
+
+  
+
+    COMPONENT ReqLatch 
+
+ GENERIC ( Max: integer; Min: integer ); 
+
+    PORT( 
+
+         SYSCLK : IN  std_logic; 
+
+         Input : IN  std_logic_vector(Max downto Min); 
+
+         Here : IN  std_logic_vector(4 downto 1); 
+
+         ClrHere : IN  std_logic; 
+
+ClrAll : IN  std_logic; 
+
+         Value : OUT  std_logic_vector(Max downto Min) 
+
+        ); 
+
+    END COMPONENT; 
+
+     
+
+ 
+
+   --Inputs 
+
+   signal SYSCLK : std_logic := '0'; 
+
+   signal Input : std_logic_vector(3 downto 1) := (others => '0'); 
+
+   signal Here : std_logic_vector(4 downto 1) := (others => '0'); 
+
+   signal ClrHere : std_logic := '0'; 
+
+signal ClrAll : std_logic := '0'; 
+
+ 
+
+ 	--Outputs 
+
+   signal Value : std_logic_vector(3 downto 1); 
+
+ 
+
+   --Declaring vector for temporal 
+
+signal Temporal: std_logic_vector(5 downto 0):="000000"; 
+
+  
+
+BEGIN 
+
+  
+
+-- Instantiate the Unit Under Test (UUT) 
+
+   uut: ReqLatch GENERIC MAP ( Max => 3, Min => 1 ) 
+
+  PORT MAP ( 
+
+          SYSCLK => SYSCLK, 
+
+          Input => Input, 
+
+          Here => Here, 
+
+          ClrHere => ClrHere, 
+
+ ClrAll => ClrAll, 
+
+          Value => Value 
+
+        ); 
+
+ 
+
+-- *** Test Bench -- User Defined Section *** 
+
+tb: Process 
+
+begin 
+
+for i in 0 to 50 loop -- VHDL loop statement  
+
+SYSCLK <= TEMPORAL(0); -- assigning the LSB of TEMPORAL to CLK 
+
+TEMPORAL <= std_logic_vector(UNSIGNED(TEMPORAL) + 1);  
+
+-- increment TEMPORAL 
+
+if (TEMPORAL = "000010") then -- VHDL if statement 
+
+CLRALL <= '1';  
+
+end if;  
+
+if (TEMPORAL = "000100") then -- VHDL if statement 
+
+CLRALL <= '0';  
+
+Input <= "101";  
+
+end if; 
+
+if (TEMPORAL = "000110") then -- VHDL if statement 
+
+Input <= "000";  
+
+Here <= "0100"; 
+
+ClrHere <= '1'; 
+
+end if; 
+
+if (TEMPORAL = "001000") then -- VHDL if statement 
+
+Here <= "0010"; 
+
+ClrHere <= '0'; 
+
+end if; 
+
+if (TEMPORAL = "001010") then -- VHDL if statement 
+
+Here <= "0001"; 
+
+ClrHere <= '1'; 
+
+end if; 
+
+wait for 50 ns; -- CLK high/low for 50ns 
+
+end loop;  
+
+      wait; 
+
+   end process; 
+
+ 
+
+END; 
