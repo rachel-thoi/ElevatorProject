@@ -1,0 +1,243 @@
+---------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer:  
+
+--  
+
+-- Create Date:    14:23:25 04/21/2025  
+
+-- Design Name:  
+
+-- Module Name:    SimController - Behavioral  
+
+-- Project Name:  
+
+-- Target Devices:  
+
+-- Tool versions:  
+
+-- Description:  
+
+-- 
+
+-- Dependencies:  
+
+-- 
+
+-- Revision:  
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments:  
+
+-- 
+
+---------------------------------------------------------------------------------- 
+
+library IEEE; 
+
+use IEEE.STD_LOGIC_1164.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+--use IEEE.NUMERIC_STD.ALL; 
+
+ 
+
+-- Uncomment the following library declaration if instantiating 
+
+-- any Xilinx primitives in this code. 
+
+--library UNISIM; 
+
+--use UNISIM.VComponents.all; 
+
+ 
+
+entity SimController is 
+
+port ( SYSCLK:		in		std_logic; 
+
+ POC:			in		std_logic; 
+
+ EMVUP:		in		std_logic; 
+
+ EMVDN:		in		std_logic; 
+
+ EOPEN:		in		std_logic; 
+
+ ECLOSE:		in		std_logic; 
+
+ ECOMP:		out	std_logic; 
+
+  
+
+ RcoPC:		in		std_logic; 
+
+ EFInt:		in		std_logic_vector(4 downto 1); 
+
+ DelaySel:	out	std_logic; 
+
+ LoadPC:		out	std_logic; 
+
+ EnPC:		out	std_logic; 
+
+ LoadCF:		out	std_logic; 
+
+ LshCF:		out	std_logic; 
+
+ RshCF:		out	std_logic); 
+
+end SimController; 
+
+ 
+
+architecture Behavioral of SimController is 
+
+type states is (Inactive, UpWait, DownWait, DoorWait); 
+
+signal state: states := Inactive; 
+
+begin 
+
+process(sysclk) 
+
+begin 
+
+if (rising_edge(SYSCLK)) then 
+
+case state is  
+
+when Inactive =>  
+
+if (EMVUP and not EFINT(4)) = '1' then 
+
+state <= UpWait;  
+
+elsif (EMVDN and not EFInt(1)) = '1' then 
+
+state <= DownWait;  
+
+elsif (EOPEN or ECLOSE) = '1' then  
+
+state <= DoorWait; 
+
+else 
+
+state <= Inactive;  
+
+end if; 
+
+ 
+
+when UpWait =>  
+
+if (RcoPC) = '1' then  
+
+state <= Inactive;  
+
+else  
+
+state <= UpWait;  
+
+end if;  
+
+ 
+
+when DoorWait =>  
+
+if (RcoPC and not EOPEN) = '1' then  
+
+state <= Inactive;  
+
+else 
+
+state <= DoorWait;  
+
+end if; 
+
+ 
+
+when DownWait => 
+
+if (RcoPC) = '1' then  
+
+state <= Inactive;  
+
+else 
+
+state <= DownWait;  
+
+end if;  
+
+ 
+
+end case;  
+
+if POC = '1' then 
+
+state <= Inactive; 
+
+end if; 
+
+end if;  
+
+end process; 
+
+ 
+
+with state select 
+
+ECOMP <= not ((EMVUP and not EFInt(4)) or (EMVDN and not EFInt(1)) 
+
+or EOPEN or ECLOSE) when Inactive, 
+
+'0' when others; 
+
+with state select 
+
+DelaySel <= EOPEN or ECLOSE when Inactive, 
+
+EOPEN when DoorWait, 
+
+'0' when others; 
+
+with state select 
+
+LoadPC <= ((EMVUP and not EFInt(4)) or (EMVDN and not EFInt(1)) 
+
+or EOPEN or ECLOSE) when Inactive, 
+
+ EOPEN when DoorWait, 
+
+ '0' when others; 
+
+with state select 
+
+EnPC <= ((EMVUP and not EFInt(4)) or (EMVDN and not EFInt(1)) 
+
+or EOPEN or ECLOSE) when Inactive, 
+
+  not RcoPC when UpWait, 
+
+  not RcoPC when DownWait, 
+
+  not (RcoPC and not EOPEN) when DoorWait, 
+
+  '0' when others; 
+
+LoadCF <= POC; 
+
+LshCF <= RcoPC when state = UpWait else '0'; 
+
+RshCF <= RcoPC when state = DownWait else '0'; 
+
+ 
+
+end Behavioral; 
