@@ -1,0 +1,255 @@
+-------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer: 
+
+-- 
+
+-- Create Date:   19:53:33 04/20/2025 
+
+-- Design Name:    
+
+-- Module Name:   U:/Documents/ECE3561/ECE3561Proj3/ReqProcessorTest1.vhd 
+
+-- Project Name:  ECE3561Proj3 
+
+-- Target Device:   
+
+-- Tool versions:   
+
+-- Description:    
+
+--  
+
+-- VHDL Test Bench Created by ISE for module: ReqProcessor 
+
+--  
+
+-- Dependencies: 
+
+--  
+
+-- Revision: 
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments: 
+
+-- 
+
+-- Notes:  
+
+-- This testbench has been automatically generated using types std_logic and 
+
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends 
+
+-- that these types always be used for the top-level I/O of a design in order 
+
+-- to guarantee that the testbench will bind correctly to the post-implementation  
+
+-- simulation model. 
+
+-------------------------------------------------------------------------------- 
+
+LIBRARY ieee; 
+
+USE ieee.std_logic_1164.ALL; 
+
+  
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+USE ieee.numeric_std.ALL; 
+
+  
+
+ENTITY ReqProcessorTest1 IS 
+
+END ReqProcessorTest1; 
+
+  
+
+ARCHITECTURE behavior OF ReqProcessorTest1 IS  
+
+  
+
+    -- Component Declaration for the Unit Under Test (UUT) 
+
+  
+
+    COMPONENT ReqProcessor 
+
+    PORT( 
+
+         UpReq : IN  std_logic_vector(3 downto 1); 
+
+         DnReq : IN  std_logic_vector(4 downto 2); 
+
+         GoReq : IN  std_logic_vector(4 downto 1); 
+
+         Here : IN  std_logic_vector(4 downto 1); 
+
+         Up : IN  std_logic; 
+
+         Dn : IN  std_logic; 
+
+         ReqUp : OUT  std_logic; 
+
+         ReqDn : OUT  std_logic; 
+
+         ReqHere : OUT  std_logic 
+
+        ); 
+
+    END COMPONENT; 
+
+     
+
+ 
+
+   --Inputs 
+
+   signal UpReq : std_logic_vector(3 downto 1) := (others => '0'); 
+
+   signal DnReq : std_logic_vector(4 downto 2) := (others => '0'); 
+
+   signal GoReq : std_logic_vector(4 downto 1) := (others => '0'); 
+
+   signal Here : std_logic_vector(4 downto 1) := (others => '0'); 
+
+   signal Up : std_logic := '0'; 
+
+   signal Dn : std_logic := '0'; 
+
+ 
+
+ 	--Outputs 
+
+   signal ReqUp : std_logic; 
+
+   signal ReqDn : std_logic; 
+
+   signal ReqHere : std_logic; 
+
+ 
+
+--Declaring vector for temporal 
+
+signal Temporal: std_logic_vector(5 downto 0):="000000"; 
+
+  
+
+BEGIN 
+
+  
+
+-- Instantiate the Unit Under Test (UUT) 
+
+   uut: ReqProcessor PORT MAP ( 
+
+          UpReq => UpReq, 
+
+          DnReq => DnReq, 
+
+          GoReq => GoReq, 
+
+          Here => Here, 
+
+          Up => Up, 
+
+          Dn => Dn, 
+
+          ReqUp => ReqUp, 
+
+          ReqDn => ReqDn, 
+
+          ReqHere => ReqHere 
+
+        ); 
+
+ 
+
+-- *** Test Bench -- User Defined Section *** 
+
+tb:	Process 
+
+BEGIN 
+
+for i in 0 to 50 loop -- VHDL loop statement  
+
+--SYSCLK <= TEMPORAL(0); -- assigning the LSB of TEMPORAL to CLK 
+
+TEMPORAL <= std_logic_vector(UNSIGNED(TEMPORAL) + 1);  
+
+-- increment TEMPORAL 
+
+if (TEMPORAL = "000010") then -- VHDL if statement 
+
+Here <= "0010"; 
+
+end if;  
+
+if (TEMPORAL = "000100") then -- VHDL if statement 
+
+UpReq <= "100";	-- Up request on floor 3 
+
+DnReq <= "101";	-- Down requests on floors 4 and 2 
+
+GoReq <= "0001";	-- Go request for floor 1 
+
+Up <= '1'; 
+
+end if; 
+
+if (TEMPORAL = "000110") then 
+
+Here <= "0100"; 
+
+end if; 
+
+if (TEMPORAL = "001000") then 
+
+UpReq <= "000";	-- Up request on floor 3 has been serviced 
+
+end if; 
+
+if (TEMPORAL = "001010") then 
+
+Here <= "1000"; 
+
+end if; 
+
+if (TEMPORAL = "001100") then 
+
+Up <= '0'; 
+
+end if; 
+
+if (TEMPORAL = "001110") then 
+
+DnReq <= "001";	-- Down request on floor 4 has been serviced 
+
+Dn <= '1'; 
+
+end if; 
+
+if (TEMPORAL = "010000") then 
+
+Here <= "0010"; 
+
+end if; 
+
+wait for 50 ns; -- CLK high/low for 50ns 
+
+end loop;  
+
+      wait; 
+
+   end process; 
+
+ 
+
+END; 
