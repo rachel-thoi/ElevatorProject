@@ -1,0 +1,377 @@
+-------------------------------------------------------------------------------- 
+
+-- Company:  
+
+-- Engineer: 
+
+-- 
+
+-- Create Date:   17:07:28 04/21/2025 
+
+-- Design Name:    
+
+-- Module Name:   U:/Documents/ECE3561/ECE3561Proj3/ElevControllerTest1.vhd 
+
+-- Project Name:  ECE3561Proj3 
+
+-- Target Device:   
+
+-- Tool versions:   
+
+-- Description:    
+
+--  
+
+-- VHDL Test Bench Created by ISE for module: ElevController 
+
+--  
+
+-- Dependencies: 
+
+--  
+
+-- Revision: 
+
+-- Revision 0.01 - File Created 
+
+-- Additional Comments: 
+
+-- 
+
+-- Notes:  
+
+-- This testbench has been automatically generated using types std_logic and 
+
+-- std_logic_vector for the ports of the unit under test.  Xilinx recommends 
+
+-- that these types always be used for the top-level I/O of a design in order 
+
+-- to guarantee that the testbench will bind correctly to the post-implementation  
+
+-- simulation model. 
+
+-------------------------------------------------------------------------------- 
+
+LIBRARY ieee; 
+
+USE ieee.std_logic_1164.ALL; 
+
+  
+
+-- Uncomment the following library declaration if using 
+
+-- arithmetic functions with Signed or Unsigned values 
+
+USE ieee.numeric_std.ALL; 
+
+  
+
+ENTITY ElevControllerTest1 IS 
+
+END ElevControllerTest1; 
+
+  
+
+ARCHITECTURE behavior OF ElevControllerTest1 IS  
+
+  
+
+    -- Component Declaration for the Unit Under Test (UUT) 
+
+  
+
+    COMPONENT ElevController 
+
+    PORT( 
+
+         SYSCLK : IN  std_logic; 
+
+         POC : IN  std_logic; 
+
+         UP_REQ : IN  std_logic_vector(3 downto 1); 
+
+         DN_REQ : IN  std_logic_vector(4 downto 2); 
+
+         GO_REQ : IN  std_logic_vector(4 downto 1); 
+
+         DROPEN : IN  std_logic; 
+
+         DRCLOSE : IN  std_logic; 
+
+         ECOMP : IN  std_logic; 
+
+         EF : IN  std_logic_vector(4 downto 1); 
+
+         EMVUP : OUT  std_logic; 
+
+         EMVDN : OUT  std_logic; 
+
+         EOPEN : OUT  std_logic; 
+
+         ECLOSE : OUT  std_logic; 
+
+         FLOOR_IND : OUT  std_logic_vector(4 downto 1) 
+
+        ); 
+
+    END COMPONENT; 
+
+  
+
+ COMPONENT ElevSimulator 
+
+    PORT( 
+
+         SYSCLK : IN  std_logic; 
+
+         POC : IN  std_logic; 
+
+         EMVUP : IN  std_logic; 
+
+         EMVDN : IN  std_logic; 
+
+         EOPEN : IN  std_logic; 
+
+         ECLOSE : IN  std_logic; 
+
+         ECOMP : OUT  std_logic; 
+
+         EF : OUT  std_logic_vector(4 downto 1) 
+
+        ); 
+
+    END COMPONENT; 
+
+     
+
+ 
+
+   --Inputs 
+
+   signal SYSCLK : std_logic := '0'; 
+
+   signal POC : std_logic := '0'; 
+
+   signal UP_REQ : std_logic_vector(3 downto 1) := (others => '0'); 
+
+   signal DN_REQ : std_logic_vector(4 downto 2) := (others => '0'); 
+
+   signal GO_REQ : std_logic_vector(4 downto 1) := (others => '0'); 
+
+   signal DROPEN : std_logic := '0'; 
+
+   signal DRCLOSE : std_logic := '0'; 
+
+   signal ECOMP : std_logic := '0'; 
+
+   signal EF : std_logic_vector(4 downto 1) := (others => '0'); 
+
+ 
+
+ 	--Outputs 
+
+   signal EMVUP : std_logic; 
+
+   signal EMVDN : std_logic; 
+
+   signal EOPEN : std_logic; 
+
+   signal ECLOSE : std_logic; 
+
+   signal FLOOR_IND : std_logic_vector(4 downto 1); 
+
+ 
+
+   --Declaring vector for temporal 
+
+signal Temporal: std_logic_vector(9 downto 0):="0000000000"; 
+
+  
+
+BEGIN 
+
+  
+
+-- Instantiate the Unit Under Test (UUT) 
+
+   uut: ElevController PORT MAP ( 
+
+          SYSCLK => SYSCLK, 
+
+          POC => POC, 
+
+          UP_REQ => UP_REQ, 
+
+          DN_REQ => DN_REQ, 
+
+          GO_REQ => GO_REQ, 
+
+          DROPEN => DROPEN, 
+
+          DRCLOSE => DRCLOSE, 
+
+          ECOMP => ECOMP, 
+
+          EF => EF, 
+
+          EMVUP => EMVUP, 
+
+          EMVDN => EMVDN, 
+
+          EOPEN => EOPEN, 
+
+          ECLOSE => ECLOSE, 
+
+          FLOOR_IND => FLOOR_IND 
+
+        ); 
+
+   
+
+helper: ElevSimulator PORT MAP ( 
+
+          SYSCLK => SYSCLK, 
+
+          POC => POC, 
+
+          EMVUP => EMVUP, 
+
+          EMVDN => EMVDN, 
+
+          EOPEN => EOPEN, 
+
+          ECLOSE => ECLOSE, 
+
+          ECOMP => ECOMP, 
+
+          EF => EF 
+
+        ); 
+
+ 
+
+   -- *** Test Bench -- User Defined Section *** 
+
+tb: Process 
+
+BEGIN 
+
+for i in 0 to 1023 loop -- VHDL loop statement  
+
+SYSCLK <= TEMPORAL(0); -- assigning the LSB of TEMPORAL to CLK 
+
+TEMPORAL <= std_logic_vector(UNSIGNED(TEMPORAL) + 1);  
+
+-- increment TEMPORAL 
+
+if (TEMPORAL = "0000000000") then 
+
+POC <= '1'; 
+
+elsif (TEMPORAL = "0000000010") then 
+
+POC <= '0'; 
+
+elsif (TEMPORAL = "0000000100") then 
+
+UP_REQ <= "101";	-- Up request on floors 3 and 1 
+
+DN_REQ <= "101";	-- Down requests on floors 4 and 2 
+
+GO_REQ <= "0000";	-- No go requests yet 
+
+elsif (TEMPORAL = "0000000110") then 
+
+UP_REQ <= "000"; 
+
+DN_REQ <= "000"; 
+
+GO_REQ <= "0000"; 
+
+elsif (TEMPORAL = "0010000000") then 
+
+GO_REQ <= "0001";	-- The person on the 3rd floor changed their 
+
+-- mind about going up; now wants to go to 
+
+-- floor 1 
+
+elsif (TEMPORAL = "0010000010") then 
+
+GO_REQ <= "0000"; 
+
+elsif (TEMPORAL = "0011000000") then 
+
+DRCLOSE <= '1';	-- Person on floor 4 presses the door close button 
+
+elsif (TEMPORAL = "0011000010") then 
+
+DRCLOSE <= '0'; 
+
+elsif (TEMPORAL = "0100011100") then 
+
+DROPEN <= '1';	-- Person on floor 2 presses the door open button 
+
+-- as the door closes 
+
+elsif (TEMPORAL = "0100011110") then 
+
+DROPEN <= '0'; 
+
+ 
+
+elsif (TEMPORAL = "1000000000") then	-- Second test; simulate the scenario 
+
+-- described in the assignment 
+
+GO_REQ <= "0010";	-- Move to 2nd floor, set DIRECTION to UP 
+
+elsif (TEMPORAL = "1000000010") then 
+
+GO_REQ <= "0000"; 
+
+elsif (TEMPORAL = "1000100000") then 
+
+UP_REQ <= "001";	-- UP_REQ(1) is pending 
+
+DN_REQ <= "010";	-- DN_REQ(3) is pending 
+
+elsif (TEMPORAL = "1000100010") then 
+
+UP_REQ <= "000"; 
+
+DN_REQ <= "000"; 
+
+elsif (TEMPORAL = "1001010010") then 
+
+DN_REQ <= "100";	-- During this movement, DN_REQ(4) is asserted 
+
+elsif (TEMPORAL = "1001010100") then 
+
+DN_REQ <= "000"; 
+
+elsif (TEMPORAL = "1001100000") then 
+
+UP_REQ <= "010";	-- Assert UP_REQ(2) to check that the elevator 
+
+-- doesn't stop there 
+
+elsif (TEMPORAL = "1001100010") then 
+
+UP_REQ <= "000"; 
+
+end if; 
+
+ 
+
+wait for 250 ms; -- CLK high/low for 50ns 
+
+end loop;  
+
+      wait; 
+
+   end process; 
+
+ 
+
+END; 
